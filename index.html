@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titanic Survival Prediction</title>
+
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+  <style>
+    body { font-family: sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 2em; display: flex; justify-content: center; }
+    .container { max-width: 600px; background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    h1, h2 { text-align: center; color: #0056b3; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+    label { font-weight: bold; }
+    input, select, button { padding: 0.8em; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+    button { background-color: #007bff; color: white; font-size: 1em; cursor: pointer; grid-column: 1 / -1; }
+    button:hover { background-color: #0056b3; }
+    #output-div { margin-top: 1.5em; padding: 1em; text-align: center; font-size: 1.2em; font-weight: bold; border-radius: 4px; }
+    .survived { background-color: #d4edda; color: #155724; }
+    .not-survived { background-color: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🚢 Titanic Survival Prediction</h1>
+    <p>Enter the passenger's data to predict whether they would have survived the sinking.</p>
+
+    <div class="form-grid">
+      <div>
+        <label for="pclass">Class (Pclass):</label>
+        <select id="pclass">
+          <option value="1">1st Class</option>
+          <option value="2">2nd Class</option>
+          <option value="3">3rd Class</option>
+        </select>
+      </div>
+      <div>
+        <label for="sex">Gender (Sex):</label>
+        <select id="sex">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div>
+        <label for="age">Age:</label>
+        <input type="number" id="age" value="28">
+      </div>
+      <div>
+        <label for="fare">Fare:</label>
+        <input type="number" id="fare" step="0.01" value="30">
+      </div>
+      <div>
+        <label for="sibsp">Siblings/Spouses (SibSp):</label>
+        <input type="number" id="sibsp" value="0">
+      </div>
+      <div>
+        <label for="parch">Parents/Children (Parch):</label>
+        <input type="number" id="parch" value="0">
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label for="embarked">Port of Embarkation (Embarked):</label>
+        <select id="embarked">
+          <option value="S">Southampton</option>
+          <option value="C">Cherbourg</option>
+          <option value="Q">Queenstown</option>
+        </select>
+      </div>
+      <button id="predict-button" type="button" py-click="predict_survival">Predict Survival</button>
+    </div>
+
+    <div id="output-div">The prediction result will appear here.</div>
+  </div>
+
+  <py-config>
+    # List of required packages for your code to run in the browser.
+    # PyScript will download and install them.
+    packages = ["pandas", "scikit-learn", "joblib"]
+  </py-config>
+
+  <py-script>
+    import pandas as pd
+    import joblib
+    from pyodide.http import pyfetch
+    from js import document, console
+    import io
+
+    # Global variable to store the loaded pipeline and avoid reloading it
+    pipeline = None
+
+    async def load_model():
+        """Asynchronously loads the .joblib model file."""
+        global pipeline
+        if pipeline is None:
+            console.log("Loading the model...")
+            try:
+                response = await pyfetch('./titanic_pipeline.joblib')
+                if response.ok:
+                    model_bytes = await response.bytes()
+                    pipeline = joblib.load(io.BytesIO(model_bytes))
+                    console.log("Model loaded successfully!")
+                else:
+                    console.error(f"Error fetching the model: {response.status}")
+            except Exception as e:
+                console.error(f"An error occurred while loading the model: {e}")
+
+    async def predict_survival(*args, **kwargs):
+        """Function called by the button to make a prediction."""
+        # Ensure the model is loaded before predicting
+        await load_model()
+        if pipeline is None:
+            output_div = document.getElementById('output-div')
+            output_div.innerText = "Error: Model could not be loaded."
+            output_div.className = "not-survived"
+            return
+
+        console.log("Collecting data from the form...")
+
+        # Collect data from the HTML form
+        # The IDs must match those defined in the HTML tags
+        data = {
+            'Pclass': str(document.getElementById('pclass').value), # Converted to string, as in the notebook
+            'Sex': document.getElementById('sex').value,
+            'Age': float(document.getElementById('age').value),
+            'SibSp': int(document.getElementById('sibsp').value),
+            'Parch': int(document.getElementById('parch').value),
+            'Fare': float(document.getElementById('fare').value),
+            'Embarked': document.getElementById('embarked').value
+        }
+
+        # Create a pandas DataFrame with the data, as the pipeline expects this format
+        input_df = pd.DataFrame([data])
+        console.log("Input DataFrame created:")
+        console.log(str(input_df))
+
+        # Make the prediction
+        prediction = pipeline.predict(input_df)[0]
+        console.log(f"Prediction result: {prediction}")
+
+        # Display the result on the screen
+        output_div = document.getElementById('output-div')
+        if prediction == '1':
+            output_div.innerText = "Result: Likely to Survive"
+            output_div.className = "survived" # Add class to style the background
+        else:
+            output_div.innerText = "Result: Unlikely to Survive"
+            output_div.className = "not-survived" # Add class to style the background
+
+  </py-script>
+</body>
+</html>
