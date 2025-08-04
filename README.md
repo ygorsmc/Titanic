@@ -86,5 +86,5 @@ Distributed under the MIT License.
 ## 🔗 Author
 
 * **Ygor Carvalho**
-* **LinkedIn:** linkedin.com/in/ygorsmc
-* **GitHub:** github.com/ygorsmc
+* **LinkedIn:** linkedin.com/in/ygorsmc(https://linkedin.com/in/ygorsmc/)**
+* **GitHub:** github.com/ygorsmc(https://github.com/ygorsmc)**
