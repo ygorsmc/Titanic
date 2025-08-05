@@ -10,7 +10,7 @@ This project demonstrates the complete lifecycle of a Machine Learning model: fr
 
 You can try the live application! This repository is enabled with GitHub Pages.
 
-**The project is live at: [https://ygorsmc.github.io/Titanic/](https://ygorsmc.github.io/Titanic/)**
+**The project is live at: [https://ygorsmc.github.io/Titanic-PyScript-Demo/](https://ygorsmc.github.io/Titanic-PyScript-Demo/)**
 
 ## 📊 Data Visualization
 
