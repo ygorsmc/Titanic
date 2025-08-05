@@ -19,17 +19,23 @@ To better understand the dataset, an exploratory data analysis was performed. Th
 #### Age Distribution
 This histogram shows the distribution of passenger ages. The majority of passengers were young adults, between 20 and 40 years old. This information was crucial for handling missing `Age` values by imputing the median.
 
-![Age Distribution](./assets/age_distribution.png)
+<div align="center">
+  <img src="./assets/age_distribution.png" width="600">
+</div>
 
 #### Survival by Gender
 This chart clearly illustrates the "women and children first" protocol. The survival rate for females was significantly higher than for males.
 
-![Survival by Gender](./assets/survival_by_gender.png)
+<div align="center">
+  <img src="./assets/survival_by_gender.png" width="600">
+</div>
 
 #### Survival by Passenger Class
 Survival was strongly correlated with passenger class. First-class passengers had a much higher chance of survival, while third-class passengers had the lowest rate.
 
-![Survival by Passenger Class](./assets/survival_by_class.png)
+<div align="center">
+  <img src="./assets/survival_by_class.png" width="600">
+</div>
 
 ## ✨ Features
 
